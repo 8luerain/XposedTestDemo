@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 helper.getMacAddress();
                 helper.getImsi();
                 helper.getBuildInfo();
+                helper.getPhoneStatus();
                 helper.getGpsLocation(new IdCheckerHelper.GpsLocationUpdate() {
                     @Override
                     public void OnLocationChangeed() {

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -55,9 +56,9 @@ public class IdCheckerHelper {
         String fingerprint = Build.FINGERPRINT;
         String bootloader = Build.BOOTLOADER;
         String serial = Build.SERIAL;
-        bean.idVaule="fingerprint is: "+fingerprint+"\n";
-        bean.idVaule+="bootloader is: "+bootloader+"\n";
-        bean.idVaule+="serial is: "+serial+"\n";
+        bean.idVaule = "fingerprint is: " + fingerprint + "\n";
+        bean.idVaule += "bootloader is: " + bootloader + "\n";
+        bean.idVaule += "serial is: " + serial + "\n";
         mData.add(bean);
         return bean;
     }
@@ -75,12 +76,25 @@ public class IdCheckerHelper {
         return bean;
     }
 
+    public IdBean getPhoneStatus() {
+        IdBean bean = new IdBean();
+        bean.idName = "Phone statues";
+        mTelecomManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        String networkOperator = mTelecomManager.getNetworkOperator();
+        GsmCellLocation gsmCellLocation = (GsmCellLocation) mTelecomManager.getCellLocation();
+        bean.idVaule = networkOperator;
+        bean.idVaule += "位置编号: " + gsmCellLocation.getLac() + "  基站ID是：" + gsmCellLocation.getCid() + "\n ";
+        mData.add(bean);
+        return bean;
+    }
+
     public void getGpsLocation(final GpsLocationUpdate locationUpdateLinsenter) {
         final IdBean bean = new IdBean("GPS");
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         bean.idVaule = "lastlocation : " + lastKnownLocation + "\n";
         MockLocationManager.getInstance(mContext).setCurrentProvider(new MockLocationManager.staticMockLocationProvider());
+        MockLocationManager.getInstance(mContext).setIsDynimic(true);
         MockLocationManager.getInstance(mContext).startMock();
         locationManager.requestLocationUpdates(MockLocationManager.MOCK_PROVIDER, 1000, 10, new LocationListener() {
             @Override

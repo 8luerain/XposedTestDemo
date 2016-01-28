@@ -18,6 +18,7 @@ public class MockLocationManager {
     private Context mContext;
     private MockLocationProvider currentProvider;
     public static final String MOCK_PROVIDER = "mockProvider";
+    public static boolean isDynimic = false;
 
 
     LocationManager manager;
@@ -28,6 +29,15 @@ public class MockLocationManager {
 
 
     }
+
+    public static boolean isDynimic() {
+        return isDynimic;
+    }
+
+    public static void setIsDynimic(boolean isDynimic) {
+        MockLocationManager.isDynimic = isDynimic;
+    }
+
 
     public static synchronized MockLocationManager getInstance(Context context) {
         if (null == INSTANCE) {
@@ -43,7 +53,29 @@ public class MockLocationManager {
         }
         manager.setTestProviderEnabled(MOCK_PROVIDER, true);
 
+        if (isDynimic) {
+            dnyimicSetLocation();
+            return;
+        }
         setLocation(getCurrentProvider().getMockLocation());
+    }
+
+
+    private void dnyimicSetLocation() {
+        currentProvider = new DynmicMockLocationProvider();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    setLocation(currentProvider.getMockLocation());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     public void stopMock() {
@@ -89,6 +121,21 @@ public class MockLocationManager {
         @Override
         public MockLocation getMockLocation() {
             return mMockLocation;
+        }
+    }
+
+    public static class DynmicMockLocationProvider implements MockLocationProvider {
+        private MockLocation mMockLocation = new MockLocation(1.1111111, 2.222222);
+
+        private MockLocation reSetValue(MockLocation location) {
+            location.lautatue += 0.000001;
+            location.longtatue += 0.000001;
+            return mMockLocation;
+        }
+
+        @Override
+        public MockLocation getMockLocation() {
+            return reSetValue(mMockLocation);
         }
     }
 
