@@ -40,19 +40,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 helper.getImei();
-                helper.write2SD("wwwww");
+//                helper.write2SD("wwwww");
                 helper.getAndroidId();
                 helper.getSerialNumber();
                 helper.getMacAddress();
                 helper.getImsi();
                 helper.getBuildInfo();
                 helper.getPhoneStatus();
-                helper.getGpsLocation(new IdCheckerHelper.GpsLocationUpdate() {
-                    @Override
-                    public void OnLocationChangeed() {
-                        mIdListViewAdapter.notifyDataSetChanged();
-                    }
-                });
+                helper.getInternetAction();
+//                helper.getGpsLocation(new IdCheckerHelper.GpsLocationUpdate() {
+//                    @Override
+//                    public void OnLocationChangeed() {
+//                        mIdListViewAdapter.notifyDataSetChanged();
+//                    }
+//                });
                 mIdListViewAdapter.notifyDataSetChanged();
             }
         });

@@ -14,11 +14,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,11 +206,55 @@ public class IdCheckerHelper {
         }
     }
 
+    public void getInternetAction() {
+        new HttpRequestThread().start();
+    }
+
     public List<IdBean> getData() {
         return mData;
     }
 
     interface GpsLocationUpdate {
         void OnLocationChangeed();
+    }
+
+    static class HttpRequestThread extends Thread {
+        @Override
+        public void run() {
+            OutputStream outputStream = null;
+            BufferedReader reader = null;
+            try {
+                String s = "wo ha ha ha ha";
+                byte[] bytes = s.getBytes();
+                URL url = new URL("http://www.baidu.com");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                outputStream = connection.getOutputStream();
+                outputStream.write(bytes);
+                outputStream.flush();
+                InputStream inputStream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder builder = new StringBuilder();
+                String tmp;
+                while ((tmp = reader.readLine()) != null) {
+                    builder.append(tmp);
+                }
+                Log.d("TAG", builder.toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+
+            } finally {
+                if (null != outputStream) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+            super.run();
+        }
     }
 }
