@@ -1,11 +1,7 @@
 package xiaomeng.bupt.com.demo;
 
 import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -22,6 +18,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,19 +53,6 @@ public class IdCheckerHelper {
         return bean;
     }
 
-    public IdBean getBuildInfo() {
-        IdBean bean = new IdBean();
-        bean.idName = "Buid info";
-        String fingerprint = Build.FINGERPRINT;
-        String bootloader = Build.BOOTLOADER;
-        String serial = Build.SERIAL;
-        bean.idVaule = "fingerprint is: " + fingerprint + "\n";
-        bean.idVaule += "bootloader is: " + bootloader + "\n";
-        bean.idVaule += "serial is: " + serial + "\n";
-        mData.add(bean);
-        return bean;
-    }
-
     public IdBean getImsi() {
         IdBean bean = new IdBean();
         bean.idName = "IMSI";
@@ -79,6 +63,76 @@ public class IdCheckerHelper {
             mData.add(bean);
         }
 
+        mData.add(bean);
+        return bean;
+    }
+
+
+    public IdBean getSerialInfo() {
+        IdBean bean = new IdBean();
+        bean.idName = "SERIAL  ";
+        String serial = Build.SERIAL;
+        bean.idVaule = serial;
+        mData.add(bean);
+        return bean;
+    }
+
+    public IdBean getAndroidId() {
+        IdBean bean = new IdBean();
+        bean.idName = "Android ID";
+        String android = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        bean.idVaule = android;
+        mData.add(bean);
+        return bean;
+    }
+
+    public IdBean getUniqueNum() {
+        IdBean bean = new IdBean();
+        bean.idName = "UniqueNum ";
+        String serialnum = null;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class);
+            serialnum = (String) (get.invoke(c, "ro.serialno", "unknown"));
+            bean.idVaule = serialnum;
+        } catch (Exception ignored) {
+            }
+        mData.add(bean);
+        return bean;
+    }
+
+    public IdBean getSIMSerialId() {
+        IdBean bean = new IdBean();
+        bean.idName = "SIMSerialId";
+        mTelecomManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        String simSerialNumber = mTelecomManager.getSimSerialNumber();
+        bean.idVaule = simSerialNumber;
+        mData.add(bean);
+        return bean;
+    }
+
+
+    public IdBean getPhoneNum() {
+        IdBean bean = new IdBean();
+        bean.idName = "phoneNum ";
+        mTelecomManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        String phoneNum = mTelecomManager.getLine1Number();
+        bean.idVaule = phoneNum;
+        mData.add(bean);
+        return bean;
+    }
+
+
+    public IdBean getBuildInfo() {
+        IdBean bean = new IdBean();
+        bean.idName = "Buid info";
+        String fingerprint = Build.FINGERPRINT;
+        String bootloader = Build.BOOTLOADER;
+        String serial = Build.SERIAL;
+        bean.idVaule = "fingerprint is: " + fingerprint + "\n";
+        bean.idVaule += "bootloader is: " + bootloader + "\n";
+        bean.idVaule += "serial is: " + serial + "\n";
+        mData.add(bean);
         return bean;
     }
 
@@ -94,52 +148,44 @@ public class IdCheckerHelper {
         return bean;
     }
 
-    public void getGpsLocation(final GpsLocationUpdate locationUpdateLinsenter) {
-        final IdBean bean = new IdBean("GPS");
-        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        bean.idVaule = "lastlocation : " + lastKnownLocation + "\n";
-        MockLocationManager.getInstance(mContext).setCurrentProvider(new MockLocationManager.staticMockLocationProvider());
-        MockLocationManager.getInstance(mContext).setIsDynimic(true);
-        MockLocationManager.getInstance(mContext).startMock();
-        locationManager.requestLocationUpdates(MockLocationManager.MOCK_PROVIDER, 1000, 10, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                String updateLocation = "经度：" + location.getLongitude() + " 纬度：" + location.getLatitude() + " 海拔：" + location.getAltitude() + " " +
-                        "方向：" + location.getBearing() + " 精度：" + location.getAccuracy() + "\n";
-                IdBean bean_updata = new IdBean("GPS UPDATE");
-                bean_updata.idVaule = updateLocation;
-                mData.add(bean_updata);
-                locationUpdateLinsenter.OnLocationChangeed();
+//    public void getGpsLocation(final GpsLocationUpdate locationUpdateLinsenter) {
+//        final IdBean bean = new IdBean("GPS");
+//        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+//        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        bean.idVaule = "lastlocation : " + lastKnownLocation + "\n";
+//        MockLocationManager.getInstance(mContext).setCurrentProvider(new MockLocationManager.staticMockLocationProvider());
+//        MockLocationManager.getInstance(mContext).setIsDynimic(true);
+//        MockLocationManager.getInstance(mContext).startMock();
+//        locationManager.requestLocationUpdates(MockLocationManager.MOCK_PROVIDER, 1000, 10, new LocationListener() {
+//            @Override
+//            public void onLocationChanged(Location location) {
+//                String updateLocation = "经度：" + location.getLongitude() + " 纬度：" + location.getLatitude() + " 海拔：" + location.getAltitude() + " " +
+//                        "方向：" + location.getBearing() + " 精度：" + location.getAccuracy() + "\n";
+//                IdBean bean_updata = new IdBean("GPS UPDATE");
+//                bean_updata.idVaule = updateLocation;
+//                mData.add(bean_updata);
+//                locationUpdateLinsenter.OnLocationChangeed();
+//
+//            }
+//
+//            @Override
+//            public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderEnabled(String provider) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String provider) {
+//
+//            }
+//        });
+//        mData.add(bean);
+//    }
 
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        });
-        mData.add(bean);
-    }
-
-    public IdBean getAndroidId() {
-        IdBean bean = new IdBean();
-        bean.idName = "Android ID";
-        String android = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        bean.idVaule = android;
-        mData.add(bean);
-        return bean;
-    }
 
     //Serial Number
     public IdBean getSerialNumber() {

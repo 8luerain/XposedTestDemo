@@ -40,11 +40,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 helper.getImei();
-//                helper.write2SD("wwwww");
-                helper.getAndroidId();
-                helper.getSerialNumber();
-                helper.getMacAddress();
                 helper.getImsi();
+                helper.getSerialInfo();
+                helper.getAndroidId();
+                helper.getUniqueNum();
+                helper.getSIMSerialId();
+                helper.getPhoneNum();
+//                helper.write2SD("wwwww");
+                helper.getMacAddress();
                 helper.getBuildInfo();
                 helper.getPhoneStatus();
                 helper.getInternetAction();
