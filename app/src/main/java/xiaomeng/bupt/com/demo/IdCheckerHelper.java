@@ -60,9 +60,7 @@ public class IdCheckerHelper {
         String imsi = null;
         if ((imsi = mTelecomManager.getSubscriberId()) != null) {
             bean.idVaule = imsi;
-            mData.add(bean);
         }
-
         mData.add(bean);
         return bean;
     }
