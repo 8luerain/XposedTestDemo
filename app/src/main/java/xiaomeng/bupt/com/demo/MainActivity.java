@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 helper.getUniqueNum();
                 helper.getSIMSerialId();
                 helper.getPhoneNum();
+                helper.getWifiIpAddress();
 //                helper.write2SD("wwwww");
                 helper.getMacAddress();
                 helper.getBuildInfo();

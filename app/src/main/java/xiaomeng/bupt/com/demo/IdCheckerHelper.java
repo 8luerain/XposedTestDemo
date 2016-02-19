@@ -1,6 +1,7 @@
 package xiaomeng.bupt.com.demo;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
@@ -24,6 +25,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import xiaomeng.bupt.com.demo.utils.CommonUtils;
 
 /**
  * Created by rain on 2016/1/22.
@@ -94,7 +98,7 @@ public class IdCheckerHelper {
             serialnum = (String) (get.invoke(c, "ro.serialno", "unknown"));
             bean.idVaule = serialnum;
         } catch (Exception ignored) {
-            }
+        }
         mData.add(bean);
         return bean;
     }
@@ -105,6 +109,19 @@ public class IdCheckerHelper {
         mTelecomManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
         String simSerialNumber = mTelecomManager.getSimSerialNumber();
         bean.idVaule = simSerialNumber;
+        mData.add(bean);
+        return bean;
+    }
+
+    public IdBean getWifiIpAddress() {
+        IdBean bean = new IdBean();
+        bean.idName = "Wifi Address";
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+        int wei = (int) (Math.random()*10);
+        ipAddress=ipAddress>> wei;
+        String ipAddress1 = CommonUtils.int2ip(ipAddress);
+        bean.idVaule = ipAddress1;
         mData.add(bean);
         return bean;
     }
@@ -124,12 +141,16 @@ public class IdCheckerHelper {
     public IdBean getBuildInfo() {
         IdBean bean = new IdBean();
         bean.idName = "Buid info";
+        String model = Build.MODEL;
+        String os = Build.VERSION.RELEASE;
         String fingerprint = Build.FINGERPRINT;
         String bootloader = Build.BOOTLOADER;
         String serial = Build.SERIAL;
         bean.idVaule = "fingerprint is: " + fingerprint + "\n";
         bean.idVaule += "bootloader is: " + bootloader + "\n";
         bean.idVaule += "serial is: " + serial + "\n";
+        bean.idVaule += "model is: " + model + "\n";
+        bean.idVaule += "os is: " + os + "\n";
         mData.add(bean);
         return bean;
     }
